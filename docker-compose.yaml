@@ -1,0 +1,55 @@
+services:
+  backend:
+    build: ./backend
+    container_name: weather_backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/app
+      - sqlite_data:/app/data
+    networks:
+      - weather_network
+    restart: unless-stopped
+
+  telegram-bot:
+    build: ./telegram-bot
+    container_name: weather_telegram_bot
+    env_file:
+      - .env
+    environment:
+      - BACKEND_URL=http://backend:8000
+    volumes:
+      - ./telegram-bot:/app
+    depends_on:
+      - backend
+    networks:
+      - weather_network
+    restart: unless-stopped
+
+  cli-admin:
+    build: ./cli-admin
+    container_name: weather_cli_admin
+    env_file:
+      - .env
+    environment:
+      - BACKEND_URL=http://backend:8000
+      - WEBSOCKET_URL=ws://backend:8000/ws/logs
+    volumes:
+      - ./cli-admin:/app
+    depends_on:
+      - backend
+    networks:
+      - weather_network
+    stdin_open: true
+    tty: true
+    profiles:
+      - admin
+
+volumes:
+  sqlite_data:
+
+networks:
+  weather_network:
+    driver: bridge
