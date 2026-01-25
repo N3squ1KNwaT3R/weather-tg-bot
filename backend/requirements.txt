@@ -3,5 +3,6 @@ uvicorn[standard]
 pydantic-settings
 httpx
 pydantic
+pydantic[email]
 python-dotenv
 aiosmtplib
