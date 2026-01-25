@@ -1,26 +1,29 @@
 import asyncio
 import os
-from loguru import logger
 from aiogram import Bot, Dispatcher
-from dotenv import find_dotenv, load_dotenv
 from aiogram.fsm.storage.memory import MemoryStorage
+from loguru import logger
+
 from handlers.registration import registration_router
+from handlers.settings import settings_router
+from handlers.weather import weather_router
 
-load_dotenv(find_dotenv())
-
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+from handlers import help_router
 
 
 async def main():
+    bot = Bot(token=os.getenv("TELEGRAM_BOT_TOKEN"))
+    storage = MemoryStorage()
+    dp = Dispatcher(storage=storage)
 
-    bot = Bot(token=TOKEN)
-    dp = Dispatcher(storage=MemoryStorage())
     dp.include_router(registration_router)
-    try:
-        logger.info("Starting Telegram Bot...")
-        await dp.start_polling(bot)
-    finally:
-        await bot.session.close()
+    dp.include_router(settings_router)
+    dp.include_router(weather_router)
+    dp.include_router(help_router)
+
+    logger.info("Bot started")
+
+    await dp.start_polling(bot)
 
 
 if __name__ == "__main__":

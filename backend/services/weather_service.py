@@ -28,7 +28,7 @@ class WeatherService:
         json_data = {
             'lang': 'pol',
             'location_id': id,
-            'forecast_days': 1,
+            'forecast_days': 2,
         }
         forecast = await self.client.post(
             f"{self.base_url}weather/location/forecast/by_id",
