@@ -33,7 +33,7 @@ async def get_user_info(
         telegram_id: int,
         db: Session = Depends(get_db)
 ):
-    """Получить информацию о пользователе"""
+
     user = db.query(User).filter(User.telegram_id == telegram_id).first()
 
     if not user:

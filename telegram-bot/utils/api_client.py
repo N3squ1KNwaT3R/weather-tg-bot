@@ -96,7 +96,7 @@ class APIClient:
             raise
 
     async def get_hourly_forecast(self, telegram_id: int, city_id: str = None, city_name: str = None) -> dict:
-        """Получить почасовой прогноз"""
+
         try:
             response = await self.client.post(
                 f"{self.base_url}/api/v1/weather/hourly",
@@ -113,7 +113,7 @@ class APIClient:
             raise
 
     async def get_tomorrow_forecast(self, telegram_id: int, city_id: str = None, city_name: str = None) -> dict:
-        """Получить прогноз на завтра"""
+
         try:
             response = await self.client.post(
                 f"{self.base_url}/api/v1/weather/tomorrow",

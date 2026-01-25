@@ -84,7 +84,7 @@ async def get_hourly_forecast(
         data: GetWeatherSchema,
         db: Session = Depends(get_db)
 ):
-    """Получить почасовой прогноз"""
+
     user = UserService.get_user(db, data.telegram_id)
 
     if not user.is_verified:

@@ -3,7 +3,7 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from loguru import logger
-from datetime import datetime  # Добавь этот импорт
+from datetime import datetime
 
 from utils.api_client import api_client
 
@@ -20,17 +20,14 @@ async def start_registration(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     user_name = message.from_user.username
 
-    # Проверяем, зарегистрирован ли уже
     try:
         user_info = await api_client.get_user_info(user_id)
 
-        # Если пользователь найден и верифицирован
         if user_info.get("is_verified"):
             city = user_info.get("city", "Не установлен")
             email = user_info.get("email", "Не указан")
             registered_at = user_info.get("created_at", "")
 
-            # Парсим дату регистрации
             if registered_at:
                 try:
                     reg_date = datetime.fromisoformat(registered_at.replace("Z", "+00:00"))
@@ -40,7 +37,6 @@ async def start_registration(message: types.Message, state: FSMContext):
             else:
                 reg_date_str = "Неизвестно"
 
-            # Текущее время
             current_time = datetime.now().strftime("%d.%m.%Y %H:%M")
 
             await message.answer(
@@ -54,7 +50,7 @@ async def start_registration(message: types.Message, state: FSMContext):
             await state.clear()
             return
 
-        # Если найден, но не верифицирован
+
         else:
             await message.answer(
                 "⚠️ Ты начал регистрацию, но не завершил верификацию.\n"
@@ -64,10 +60,9 @@ async def start_registration(message: types.Message, state: FSMContext):
             return
 
     except Exception as e:
-        # Пользователь не найден - начинаем регистрацию
+
         logger.info(f"New user {user_id} starting registration: {e}")
 
-    # Новая регистрация
     await message.answer(
         "👋 Привет! Я бот для прогноза погоды.\n\n"
         "Для начала работы нужно зарегистрироваться.\n"
@@ -78,7 +73,6 @@ async def start_registration(message: types.Message, state: FSMContext):
     logger.info(f"User {user_id} ({user_name}) started registration")
 
 
-# Остальной код без изменений...
 @registration_router.message(RegistrationStates.waiting_for_email)
 async def process_email(message: types.Message, state: FSMContext):
     email = message.text.strip()
