@@ -1,8 +1,6 @@
 from email.message import EmailMessage
 from aiosmtplib import SMTP
 import random
-from string import ascii_letters, digits
-
 
 class EmailService:
     def __init__(self, smtp: SMTP, sender: str):
@@ -10,19 +8,15 @@ class EmailService:
         self.sender = sender
         self.subject = "Confirming registration"
 
-    async def send(self, to: str):
+    async def send_verification_code(self, to: str, code: str):
         msg = EmailMessage()
         msg["From"] = self.sender
         msg["To"] = to
         msg["Subject"] = self.subject
-        msg.set_content(self._generate_body())
+        msg.set_content(f"Your verification code is: {code}.")
 
         await self.smtp.send_message(msg)
 
-    def _generate_body(self):
-        code = self._generate_code()
-        return f"Your verification code is {code}"
-
     @staticmethod
-    def _generate_code():
-        return "".join(random.choice(ascii_letters + digits) for _ in range(4))
+    def generate_code() -> str:
+        return "".join(str(random.randint(0, 9)) for _ in range(6))
