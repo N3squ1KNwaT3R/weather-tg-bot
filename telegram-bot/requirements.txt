@@ -1,0 +1,6 @@
+aiohttp
+aiogram
+loguru
+httpx
+python-dotenv
+loguru

@@ -7,7 +7,6 @@ services:
     env_file:
       - .env
     volumes:
-      - ./backend:/app
       - sqlite_data:/app/data
     networks:
       - weather_network
@@ -20,8 +19,6 @@ services:
       - .env
     environment:
       - BACKEND_URL=http://backend:8000
-    volumes:
-      - ./telegram-bot:/app
     depends_on:
       - backend
     networks:
@@ -36,8 +33,6 @@ services:
     environment:
       - BACKEND_URL=http://backend:8000
       - WEBSOCKET_URL=ws://backend:8000/ws/logs
-    volumes:
-      - ./cli-admin:/app
     depends_on:
       - backend
     networks:
