@@ -8,6 +8,7 @@ from database import init_db
 
 from api.auth import auth_router
 from api.weather import weather_router
+from api.websocket import websocket_router
 
 app = FastAPI()
 
@@ -36,6 +37,7 @@ async def shutdown():
 
 app.include_router(auth_router)
 app.include_router(weather_router)
+app.include_router(websocket_router)  # Добавляем WebSocket роутер
 
 app.add_middleware(
     CORSMiddleware,

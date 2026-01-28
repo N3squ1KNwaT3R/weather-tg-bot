@@ -1,12 +1,27 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Body
+from pydantic import BaseModel
+from typing import Dict, Optional
+from api.websocket import log_user_activity
 
-admin_router = APIRouter(prefix="/api/v1/admin", tags=["admin"])
+admin_router = APIRouter(prefix="/api/logs", tags=["logs"])
 
 
-@admin_router.get("/stats/users")
-async def users_list():
-    pass
+class ActivityLog(BaseModel):
+    user_id: int
+    username: str
+    action: str
+    details: Optional[Dict] = {}
+    level: str = "info"
 
-@admin_router.get("/admin/stats/popular-city")
-async def popular_city():
-    pass
+
+@admin_router.post("/activity")
+async def log_activity(log: ActivityLog):
+    """Endpoint для приема логов активности"""
+    await log_user_activity(
+        user_id=log.user_id,
+        username=log.username,
+        action=log.action,
+        details=log.details,
+        level=log.level
+    )
+    return {"status": "ok"}
