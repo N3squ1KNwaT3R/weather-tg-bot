@@ -1,6 +1,7 @@
 import httpx
 import os
 from loguru import logger
+from typing import Optional, Dict
 
 
 class APIClient:
@@ -42,7 +43,7 @@ class APIClient:
 
     async def search_city(self, city: str) -> list:
         try:
-            response = await self.client.get(  # Измени на GET
+            response = await self.client.get(
                 f"{self.base_url}/api/v1/weather/search",
                 params={"city": city}
             )
@@ -84,7 +85,6 @@ class APIClient:
             raise
 
     async def get_user_info(self, telegram_id: int) -> dict:
-
         try:
             response = await self.client.get(
                 f"{self.base_url}/api/v1/auth/user/{telegram_id}"
@@ -96,7 +96,6 @@ class APIClient:
             raise
 
     async def get_hourly_forecast(self, telegram_id: int, city_id: str = None, city_name: str = None) -> dict:
-
         try:
             response = await self.client.post(
                 f"{self.base_url}/api/v1/weather/hourly",
@@ -113,7 +112,6 @@ class APIClient:
             raise
 
     async def get_tomorrow_forecast(self, telegram_id: int, city_id: str = None, city_name: str = None) -> dict:
-
         try:
             response = await self.client.post(
                 f"{self.base_url}/api/v1/weather/tomorrow",
@@ -128,6 +126,30 @@ class APIClient:
         except Exception as e:
             logger.error(f"Get tomorrow forecast error: {e}")
             raise
+
+    async def log_activity(
+        self,
+        user_id: int,
+        username: str,
+        action: str,
+        details: Optional[Dict] = None,
+        level: str = "info"
+    ):
+        """Отправляет лог активности в backend для real-time мониторинга"""
+        try:
+            await self.client.post(
+                f"{self.base_url}/api/logs/activity",
+                json={
+                    "user_id": user_id,
+                    "username": username,
+                    "action": action,
+                    "details": details or {},
+                    "level": level
+                }
+            )
+        except Exception as e:
+            # Не прерываем выполнение, если логирование не удалось
+            logger.debug(f"Failed to log activity: {e}")
 
 
 api_client = APIClient()
