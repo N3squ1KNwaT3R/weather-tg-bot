@@ -7,11 +7,16 @@ services:
     env_file:
       - .env
     volumes:
-      - ./backend:/app
       - sqlite_data:/app/data
     networks:
       - weather_network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c 'import httpx; httpx.get(\"http://localhost:8000/\")' || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
 
   telegram-bot:
     build: ./telegram-bot
@@ -20,10 +25,9 @@ services:
       - .env
     environment:
       - BACKEND_URL=http://backend:8000
-    volumes:
-      - ./telegram-bot:/app
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - weather_network
     restart: unless-stopped
@@ -36,10 +40,9 @@ services:
     environment:
       - BACKEND_URL=http://backend:8000
       - WEBSOCKET_URL=ws://backend:8000/ws/logs
-    volumes:
-      - ./cli-admin:/app
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - weather_network
     stdin_open: true

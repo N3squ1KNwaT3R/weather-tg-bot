@@ -1,6 +1,5 @@
-aiohttp
-aiogram
-loguru
+websockets
 httpx
 python-dotenv
+rich
 loguru
